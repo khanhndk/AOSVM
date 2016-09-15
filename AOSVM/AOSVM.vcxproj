@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alg_type.h" />
+    <ClInclude Include="aosvm.h" />
     <ClInclude Include="kernel_type.h" />
     <ClInclude Include="learner.h" />
     <ClInclude Include="report.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aosvm.cpp" />
     <ClCompile Include="learner.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="report.cpp" />

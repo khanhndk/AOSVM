@@ -44,6 +44,7 @@
 
 
 #include "learner.h"
+#include "aosvm.h"
 
 
 

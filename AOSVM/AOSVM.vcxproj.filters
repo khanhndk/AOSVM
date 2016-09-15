@@ -44,6 +44,9 @@
     <ClInclude Include="kernel_type.h">
       <Filter>Model</Filter>
     </ClInclude>
+    <ClInclude Include="aosvm.h">
+      <Filter>Learner</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="svm_problem.cpp">
@@ -60,5 +63,8 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="aosvm.cpp">
+      <Filter>Learner</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
