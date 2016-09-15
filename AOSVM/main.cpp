@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 	char model_file_name[1024];
 	char test_file_name[1024];
 
-	svm_parameter param;
+	svm_parameter param;a
 
 	parse_command_line(argc, argv, param, input_file_name, model_file_name, test_file_name);
 
