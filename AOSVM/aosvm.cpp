@@ -43,6 +43,8 @@ report * solve_ofoc(svm_problem * train_prob, const svm_parameter * param)
 	std::vector<mydouble> q;
 	q.push_back(0);
 
+	int t;
+
 
 	for (int n = 0; n < N; n++)
 	{
