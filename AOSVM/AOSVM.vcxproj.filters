@@ -13,6 +13,9 @@
     <Filter Include="Cache">
       <UniqueIdentifier>{b54857dd-2cc1-49eb-b458-d2d029028b40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{e54870a1-8353-4df1-abed-57efb1b240fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -53,6 +56,9 @@
     <ClInclude Include="aosvm.h">
       <Filter>Learner</Filter>
     </ClInclude>
+    <ClInclude Include="multi_gauss.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="svm_problem.cpp">
@@ -69,9 +75,11 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="kernel.cpp" />
     <ClCompile Include="aosvm.cpp">
       <Filter>Learner</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel.cpp">
+      <Filter>Cache</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

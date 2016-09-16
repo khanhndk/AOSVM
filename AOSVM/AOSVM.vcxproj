@@ -147,6 +147,7 @@
     <ClInclude Include="kernel.h" />
     <ClInclude Include="kernel_type.h" />
     <ClInclude Include="learner.h" />
+    <ClInclude Include="multi_gauss.h" />
     <ClInclude Include="report.h" />
     <ClInclude Include="report_predict.h" />
     <ClInclude Include="stdafx.h" />
