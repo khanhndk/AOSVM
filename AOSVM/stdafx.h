@@ -39,6 +39,8 @@ inline double powi(double base, int times)
 #include <time.h>
 #include <random>
 
+#include "multi_gauss.h"
+
 #include "svm_node.h"
 #include "svm_parameter.h"
 #include "svm_problem.h"

@@ -162,6 +162,7 @@
     <ClCompile Include="kernel.cpp" />
     <ClCompile Include="learner.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="multi_gauss.cpp" />
     <ClCompile Include="report.cpp" />
     <ClCompile Include="report_predict.cpp" />
     <ClCompile Include="stdafx.cpp">

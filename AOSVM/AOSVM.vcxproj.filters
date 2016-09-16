@@ -81,5 +81,8 @@
     <ClCompile Include="kernel.cpp">
       <Filter>Cache</Filter>
     </ClCompile>
+    <ClCompile Include="multi_gauss.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

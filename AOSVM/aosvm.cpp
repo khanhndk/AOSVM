@@ -32,7 +32,7 @@ report * solve_ofoc(svm_problem * train_prob, const svm_parameter * param)
 	
 	std::vector<std::vector<mydouble>*> KR;
 	std::vector<mydouble>* KR_tmp = new std::vector<mydouble>();
-	KR_tmp->push_back(Kernel::k_function(prob->x[n_index[0]], prob->x[n_index[0]], *param););
+	KR_tmp->push_back(Kernel::k_function(prob->x[n_index[0]], prob->x[n_index[0]], *param));
 	KR.push_back(KR_tmp);
 	
 	std::vector<std::vector<mydouble>*> P;
@@ -43,8 +43,6 @@ report * solve_ofoc(svm_problem * train_prob, const svm_parameter * param)
 	std::vector<mydouble> q;
 	q.push_back(0);
 
-	std::default_random_engine ngen(std::chrono::system_clock::now().time_since_epoch().count());
-	std::normal_distribution<mydouble> ndist()
 
 	for (int n = 0; n < N; n++)
 	{
