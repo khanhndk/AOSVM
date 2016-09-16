@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 
 	parse_command_line(argc, argv, param, input_file_name, model_file_name, test_file_name);
 
-	svm_problem train_prob;
+	svm_problem train_prob;a
 	read_problem(input_file_name, param, train_prob);
 	if (param.max_index > 0)
 		train_prob.max_index = param.max_index;

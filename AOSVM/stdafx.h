@@ -5,6 +5,17 @@
 
 #pragma once
 
+inline double powi(double base, int times)
+{
+	double tmp = base, ret = 1.0;
+
+	for (int t = times; t>0; t /= 2)
+	{
+		if (t % 2 == 1) ret *= tmp;
+		tmp = tmp * tmp;
+	}
+	return ret;
+}
 
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
@@ -31,6 +42,8 @@
 #include "svm_node.h"
 #include "svm_parameter.h"
 #include "svm_problem.h"
+
+#include "kernel.h"
 
 #include "alg_type.h"
 #include "kernel_type.h"

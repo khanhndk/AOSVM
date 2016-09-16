@@ -10,6 +10,9 @@
     <Filter Include="Repport">
       <UniqueIdentifier>{f43cbdf4-82ca-4418-876d-1a9777a2e2ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cache">
+      <UniqueIdentifier>{b54857dd-2cc1-49eb-b458-d2d029028b40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -44,8 +47,8 @@
     <ClInclude Include="kernel_type.h">
       <Filter>Model</Filter>
     </ClInclude>
-    <ClInclude Include="aosvm.h">
-      <Filter>Learner</Filter>
+    <ClInclude Include="kernel.h">
+      <Filter>Cache</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -63,8 +66,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="aosvm.cpp">
-      <Filter>Learner</Filter>
-    </ClCompile>
+    <ClCompile Include="kernel.cpp" />
   </ItemGroup>
 </Project>
