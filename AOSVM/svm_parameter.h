@@ -61,6 +61,7 @@ struct svm_parameter
 	int contdesc; //for MSVDD
 
 	int K; //for SGDBoost, for OFOC_FF dim_rf = K*D
+	mydouble M; //for AOSVM
 
 	int floss; //using which loss funcion
 	int ploss; //using which p-normalization
