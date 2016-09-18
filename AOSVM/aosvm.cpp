@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <chrono>
 
-report * solve_ofoc(svm_problem * train_prob, const svm_parameter * param)
+report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 {
 	aosvm_report* result = new aosvm_report();
 	aosvm_model* model = new aosvm_model();
@@ -20,6 +20,7 @@ report * solve_ofoc(svm_problem * train_prob, const svm_parameter * param)
 	shuffle(n_index.begin(), n_index.end(), std::default_random_engine(seed));
 
 	mydouble lbd = param->lbd;
+	mydouble neglbd_plusone = 1.0 - lbd;
 	int M = (int)param->M;
 	mydouble C = param->C;
 	
@@ -40,10 +41,11 @@ report * solve_ofoc(svm_problem * train_prob, const svm_parameter * param)
 	P_tmp->push_back(1.0 / KR[0]->at(0));
 	P.push_back(P_tmp);
 
-	std::vector<mydouble> q;
-	q.push_back(0);
+	std::vector<mydouble> qn;
+	qn.push_back(0);
 
-	int t;
+	std::vector<mydouble> an;
+	an.push_back(1);
 
 
 	for (int n = 0; n < N; n++)
@@ -60,23 +62,209 @@ report * solve_ofoc(svm_problem * train_prob, const svm_parameter * param)
 			fn += kn[r] * beta[r];
 
 		mydouble en = -fn;
-		mydouble an = 0;
+		mydouble ann = 0;
 		if (en >= C / M)
-			an = C / en;
+			ann = C / en;
 		else if (en >= 0)
-			an = M;
+			ann = M;
+		an.push_back(ann);
 		
 		for (int r = 0; r < R; r++)
-			q[r] = lbd * q[r] + 2 * kn[r] * an;
+			qn[r] = lbd * qn[r] + 2 * kn[r] * ann;
+
+		mydouble* cov = new mydouble[R*R];
+		for (int r1 = 0; r1 < R; r1++)
+		{
+			int rstart = r1 * R;
+			KR_tmp = KR[r1];
+			for (int r2 = 0; r2 < R; r2++)
+				cov[r2 + rstart] = neglbd_plusone * (*KR_tmp)[r2];
+		}
+
+		mydouble* mu = new mydouble[R];
+		for (int r = 0; r < R; r++)
+			mu[r] = 0;
+
+		int seed = rand();
+		mydouble* gn = multinormal_sample(R, 1, cov, mu, &seed);
+		for (int r = 0; r < R; r++)
+			kn[r] += gn[r];
+
+		#pragma region Calc P
+		if (ann != 0)
+		{
+			//calc kT_P
+			mydouble* kT_P = new mydouble[R];
+			for (int r = 0; r < R; r++)
+				kT_P[r] = 0;
+			for (int r1 = 0; r1 < R; r1++)
+			{
+				mydouble knr1 = kn[r1];
+				P_tmp = P[r1];
+				for (int r2 = 0; r2 < R; r2++)
+					kT_P[r2] += knr1 * (*P_tmp)[r2];
+			}
+			mydouble P_scale = 0;
+			for (int r = 0; r < R; r++)
+				P_scale += kT_P[r] * kn[r];
+			P_scale = 1.0 / ann + P_scale / lbd; //CARE divide zero
+
+			mydouble* P_k = new mydouble[R];
+			for (int r1 = 0; r1 < R; r1++)
+			{
+				mydouble tmp = 0;
+				P_tmp = P[r1];
+
+				for (int r2 = 0; r2 < R; r2++)
+					tmp += (*P_tmp)[r2] * kn[r2];
+				P_k[r1] = tmp;
+			}
+
+			for (int r1 = 0; r1 < R; r1++)
+			{
+				P_tmp = P[r1];
+				for (int r2 = 0; r2 < R; r2++)
+					(*P_tmp)[r2] = (*P_tmp)[r2] / lbd - P_k[r1] * kT_P[r2] / (lbd*lbd);
+			}
+
+			delete[] P_k;
+			delete[] kT_P;
+
+		}
+		else
+		{
+			for (int r1 = 0; r1 < R; r1++)
+			{
+				P_tmp = P[r1];
+				for (int r2 = 0; r2 < R; r2++)
+					(*P_tmp)[r2] = (*P_tmp)[r2] / lbd;
+			}
+		}
+		#pragma endregion
+
+		for (int r1 = 0; r1 < R; r1++)
+		{
+			mydouble tmp = 0;
+			P_tmp = P[r1];
+			for (int r2 = 0; r2 < R; r2++)
+				tmp += (*P_tmp)[r2] * qn[r2];
+			beta[r1] = tmp;
+		}
 
 
+		#pragma region Add SV
+		if (en > 0)
+		{
+			//Update beta
+			beta[R] = 0;
+			beta_index[R] = nt;
+			
+			//Update KR
+			for (int r = 0; r < R; r++)
+				KR[r]->push_back(Kernel::k_function(prob->x[beta_index[r]], xnt, *param));
+			KR_tmp = new std::vector<mydouble>();
+			for (int r = 0; r <= R; r++)
+				KR_tmp->push_back(Kernel::k_function(xnt, prob->x[beta_index[r]], *param));
+			KR.push_back(KR_tmp);
+						
+			//Update P
+			mydouble* c_tmp = new mydouble[R];
+			for (int ci = 0; ci < R; ci++)
+			{
+				mydouble tmp = 0;
+				KR_tmp = KR[ci];
+				for (int bi = 0; bi < R; bi++)
+					tmp += kn[bi] * an[bi] * (*KR_tmp)[bi];
+				tmp += 1.0 * ann * 1.0; //just for RBF
+				c_tmp[ci] = tmp;
+			}
+			mydouble d_tmp = 0;
+			for (int bi = 0; bi < R; bi++)
+				d_tmp += kn[bi] * an[bi] * kn[bi];
+			d_tmp += 1.0 * ann * 1.0; //just for RBF
+			mydouble* cT_P = new mydouble[R];
+			for (int r = 0; r < R; r++)
+				cT_P[r] = 0;
+			for (int r1 = 0; r1 < R; r1++)
+			{
+				mydouble c_tmpr1 = c_tmp[r1];
+				P_tmp = P[r1];
+				for (int r2 = 0; r2 < R; r2++)
+					cT_P[r2] += c_tmpr1 * (*P_tmp)[r2];
+			}
+			mydouble g_tmp = 0;
+			for (int r = 0; r < R; r++)
+				g_tmp += cT_P[r] * c_tmp[r];
+			g_tmp = 1.0 / (d_tmp - g_tmp);
+			mydouble* P_c_tmp = new mydouble[R];
+			for (int r1 = 0; r1 < R; r1++)
+			{
+				mydouble tmp = 0;
+				P_tmp = P[r1];
+				for (int r2 = 0; r2 < R; r2++)
+					tmp += (*P_tmp)[r2] * c_tmp[r2];
+				P_c_tmp[r1] = tmp;
+			}
+			for (int r1 = 0; r1 < R; r1++)
+			{
+				P_tmp = P[r1];
+				for (int r2 = 0; r2 < R; r2++)
+					(*P_tmp)[r2] = (*P_tmp)[r2] + g_tmp * P_c_tmp[r1] * cT_P[r2];
+				P_tmp->push_back(-g_tmp * P_c_tmp[r1]);
+			}
+			P_tmp = new std::vector<mydouble>();
+			for (int r = 0; r < R; r++)
+				P_tmp->push_back(-g_tmp * P_c_tmp[r]);
+			P_tmp->push_back(g_tmp);
+			P.push_back(P_tmp);
+
+			delete[] cT_P;
+			delete[] c_tmp;
+
+
+			//Update an
+			//Have update above
+			//Update q
+			qn.push_back(0); //not sure, maybe k_a*a_n
+			R++;
+		}
+		delete[] gn;
 		delete[] kn;
-	}
+		#pragma endregion
 
+	}
 
 	model->beta = beta;
 	model->beta_index = beta_index;
 	model->beta_l = R;
 
 	return result;
+}
+
+void aosvm_predict(report * report, const svm_problem * test_prob, mydouble *& predict)
+{
+	aosvm_model* model = (aosvm_model*)report->model;
+	report->reset();
+	report->start();
+
+	mydouble* beta = model->beta;
+	int* beta_index = model->beta_index;
+	int beta_l = model->beta_l;
+
+	predict = new mydouble[test_prob->l];
+
+	for (int n = 0; n < test_prob->l; n++)
+	{
+		svm_node* x = test_prob->x[n];
+
+		mydouble obj = 0;
+		for (int bi = 0; bi < beta_l; bi++)
+			obj += beta[bi] * Kernel::k_function(model->prob->x[bi], x, model->param);
+
+		predict[n] = (obj > 0) ? 1 : -1;
+		if (model->switch_label)
+			predict[n] = -predict[n];
+	}
+
+	report->predict_time = report->stop();
 }
