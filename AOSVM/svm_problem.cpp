@@ -282,3 +282,23 @@ svm_problem_matrix * prob_full_matrix(svm_problem & prob, bool extend_dim, int p
 
 	return result;
 }
+
+svm_problem* get_sub_problem(const svm_problem& problem, double label)
+{
+	int l = problem.l;
+
+	std::vector<svm_node*>* listVectors = new std::vector<svm_node*>();
+	std::vector<mydouble>* listY = new std::vector<mydouble>();
+	for (int i = 0; i < l; i++)
+	{
+		if ((problem.y[i] != label)) continue;
+		listVectors->push_back(problem.x[i]);
+		listY->push_back(problem.y[i]);
+	}
+	svm_problem* subProblem = new svm_problem();
+	subProblem->l = listY->size();
+	subProblem->max_index = problem.max_index;
+	subProblem->x = listVectors->data();
+	subProblem->y = listY->data();
+	return subProblem;
+}

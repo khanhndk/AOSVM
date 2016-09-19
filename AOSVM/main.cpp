@@ -365,7 +365,7 @@ void parse_command_line(int argc, char **argv, svm_parameter& param, char *input
 			param.K = atoi(argv[i]);
 			break;
 		case 'M':
-			param.sample_size = atoi(argv[i]);
+			param.M = atof(argv[i]);
 			break;
 		case 'd':
 			param.degree = atoi(argv[i]);

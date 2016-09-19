@@ -49,3 +49,5 @@ svm_problem* prob_formalise_unbal_bin(const svm_problem& prob, std::vector<int>*
 svm_problem_eigen* prob_full_eigen(svm_problem& prob, bool extend_dim);
 
 svm_problem_matrix* prob_full_matrix(svm_problem& prob, bool extend_dim, int padding);
+
+svm_problem* get_sub_problem(const svm_problem& problem, double label);

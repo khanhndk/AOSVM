@@ -19,7 +19,7 @@ inline double powi(double base, int times)
 
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
-#define mydouble float
+#define mydouble double
 
 #define SHOWERROR(name) {std::cout << name; std::getchar();}
 

@@ -391,7 +391,7 @@ mydouble *multinormal_sample(int m, int n, mydouble a[], mydouble mu[], int *see
 		cout << "\n";
 		cout << "MULTINORMAL_SAMPLE - Fatal error!\n";
 		cout << "  The variance-covariance matrix is not positive definite symmetric.\n";
-		exit(1);
+		getchar();
 	}
 	//
 	//  Y = MxN matrix of samples of the 1D normal distribution with mean 0
@@ -508,7 +508,7 @@ double r8_uniform_01(int *seed)
 		cerr << "\n";
 		cerr << "R8_UNIFORM_01 - Fatal error!\n";
 		cerr << "  Input value of SEED = 0.\n";
-		exit(1);
+		getchar();
 	}
 
 	k = *seed / 127773;
@@ -1174,7 +1174,7 @@ mydouble *r8vec_uniform_01_new(int n, int *seed)
 		cerr << "\n";
 		cerr << "R8VEC_UNIFORM_01_NEW - Fatal error!\n";
 		cerr << "  Input value of SEED = 0.\n";
-		exit(1);
+		getchar();
 	}
 
 	r = new mydouble[n];
