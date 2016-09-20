@@ -20,7 +20,6 @@ public:
 	{
 		learning_class_rate = NULL;
 	}
-
 	void start();
 	double stop();
 	void reset();

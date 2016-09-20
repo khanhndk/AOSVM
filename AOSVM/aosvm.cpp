@@ -14,6 +14,10 @@ report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 	model->prob = prob;
 
 	int N = prob->l;
+	result->learning_rate.reserve(N);
+	result->learning_class_rate = new std::vector<double>[2]; //binary
+	result->learning_class_rate[0].reserve(N);
+	result->learning_class_rate[1].reserve(N);
 
 	//just in case dataset is not random
 	std::vector<int> n_index;
@@ -49,9 +53,13 @@ report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 
 	std::vector<mydouble> an;
 	an.push_back(1);
-	int nPos = 0;
 
 	int n_miss = 0;
+	int n_miss_pos = 0;
+	int n_miss_neg = 0;
+	int n_pos = 0;
+	int n_neg = 0;
+
 	for (int n = 1; n < N; n++)
 	{
 		int nt = n_index[n];
@@ -67,15 +75,29 @@ report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 			fn += kn[r] * beta[r];
 
 		if (ynt * (fn + 1) < 0)
+		{
 			n_miss++;
+			if (ynt < 0) 
+				n_miss_neg++;
+			else n_miss_pos++;
+		}
+		if (ynt < 0) n_neg++;
+		else n_pos++;
 
-		printf("%f\n", 1.0 * n_miss / n);
+		mydouble cur_miss_rate = 1.0 * n_miss / n;
+		mydouble cur_miss_pos = 1.0 * n_miss_pos / n_pos;
+		mydouble cur_miss_neg = 1.0 * n_miss_neg / n_neg;
+
+		printf("%f : %f : %f\n", cur_miss_rate, cur_miss_neg, cur_miss_pos);
+		result->learning_rate.push_back(cur_miss_rate);
+		result->learning_class_rate[0].push_back(cur_miss_neg);
+		result->learning_class_rate[1].push_back(cur_miss_pos);
+
 		if (ynt < 0)
 		{
 			delete[] kn;
 			continue;
 		}
-		nPos++;
 
 		mydouble en = -fn;
 		mydouble ann = 0;
@@ -192,7 +214,7 @@ report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 				KR_tmp = KR[ci];
 				//for (int bi = 0; bi < R; bi++)
 				//	tmp += kn[bi] * an[bi] * (*KR_tmp)[bi];
-				for (int ni = 0; ni <= nPos; ni++)
+				for (int ni = 0; ni <= n_pos; ni++)
 					tmp += Kernel::k_function(xnt, prob->x[n_index[ni]], *param) * an[ni] * 
 								Kernel::k_function(prob->x[beta_index[ci]], prob->x[n_index[ni]], *param);
 				//tmp += 1.0 * ann * 1.0; //just for RBF
@@ -240,7 +262,6 @@ report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 
 			delete[] cT_P;
 			delete[] c_tmp;
-
 
 			//Update an
 			//Have update above
