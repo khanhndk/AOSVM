@@ -46,12 +46,23 @@ int main(int argc, char **argv)
 			svm_predict(report, &predict_prob, predict_prob.y);
 			write_problem("predict.txt", predict_prob);
 		}
+	
+
+	}
+	else if (param.mode == 1)
+	{
+		report* report = svm_train(&train_prob, &param);
+		report->write_report_online(model_file_name);
+		printf("Learning rate: %f\n", report->learning_rate[report->learning_rate.size() - 1]);
+		int n_class = report->model->index_label->size();
+		for(int c = 0; c < n_class; c++)
+			printf("Learning rate %d: %f\n", c, report->learning_class_rate[c][report->learning_class_rate[c].size() - 1]);
+		printf("Train: %f\n", report->train_time);
+	}
 
 #ifdef _DEBUG
 		system("PAUSE");
-#endif		
-
-	}
+#endif	
 	return 0;
 }
 
