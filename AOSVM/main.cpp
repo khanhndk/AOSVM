@@ -53,10 +53,10 @@ int main(int argc, char **argv)
 	{
 		report* report = svm_train(&train_prob, &param);
 		report->write_report_online(model_file_name);
-		printf("Learning rate: %f\n", report->learning_rate[report->learning_rate.size() - 1]);
+		printf("Mistake rate: %f\n", report->mistake_rate[report->mistake_rate.size() - 1]);
 		int n_class = report->model->index_label->size();
 		for(int c = 0; c < n_class; c++)
-			printf("Learning rate %d: %f\n", c, report->learning_class_rate[c][report->learning_class_rate[c].size() - 1]);
+			printf("Mistake rate %d: %f\n", c, report->mistake_class_rate[c][report->mistake_class_rate[c].size() - 1]);
 		printf("Train: %f\n", report->train_time);
 	}
 
