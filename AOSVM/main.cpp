@@ -60,6 +60,7 @@ void parse_command_line(int argc, char **argv, svm_parameter& param, char *input
 	int i;
 
 #pragma region default values
+	param.arg = new std::string("");
 	param.demo = 0;
 	strcpy(param.file_omega, "");
 	param.full_matrix = 0;
@@ -118,6 +119,11 @@ void parse_command_line(int argc, char **argv, svm_parameter& param, char *input
 		if (argv[i][0] != '-') break;
 		if (++i >= argc)
 			SHOWERROR("input error");
+
+		param.arg->append(std::string(argv[i - 1]).substr(1));
+		param.arg->append(": ");
+		param.arg->append(std::string(argv[i]));
+		param.arg->append("\t");
 
 		if (!strcmp(argv[i - 1], "-testid"))
 		{

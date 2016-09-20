@@ -93,4 +93,6 @@ struct svm_parameter
 	int dim_rf; //dim of random feature space
 
 	char file_omega[256];
+
+	std::string* arg;
 };
