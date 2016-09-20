@@ -3,12 +3,14 @@
 
 report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 {
+	//NOTICE: the first point must a possitive instance.
+
 	aosvm_report* result = new aosvm_report();
 	aosvm_model* model = new aosvm_model();
 	result->model = model;
 
 	svm_problem* full_prob = prob_formalise_unbal_bin(*train_prob, model->index_label, model->label_index, model->switch_label);
-	svm_problem* prob = get_sub_problem(*full_prob, 1);
+	svm_problem* prob = full_prob; // get_sub_problem(*full_prob, 1);
 	model->prob = prob;
 
 	int N = prob->l;
@@ -47,12 +49,14 @@ report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 
 	std::vector<mydouble> an;
 	an.push_back(1);
+	int nPos = 0;
 
 	int n_miss = 0;
 	for (int n = 1; n < N; n++)
 	{
 		int nt = n_index[n];
 		svm_node* xnt = prob->x[nt];
+		int ynt = prob->y[nt];
 
 		mydouble* kn = new mydouble[R];
 		for (int r = 0; r < R; r++)
@@ -62,9 +66,16 @@ report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 		for (int r = 0; r < R; r++)
 			fn += kn[r] * beta[r];
 
-		if (prob->y[nt] * (fn + 1) < 0)
+		if (ynt * (fn + 1) < 0)
 			n_miss++;
+
 		printf("%f\n", 1.0 * n_miss / n);
+		if (ynt < 0)
+		{
+			delete[] kn;
+			continue;
+		}
+		nPos++;
 
 		mydouble en = -fn;
 		mydouble ann = 0;
@@ -181,7 +192,7 @@ report * solve_aosvm(svm_problem * train_prob, const svm_parameter * param)
 				KR_tmp = KR[ci];
 				//for (int bi = 0; bi < R; bi++)
 				//	tmp += kn[bi] * an[bi] * (*KR_tmp)[bi];
-				for (int ni = 0; ni <= n; ni++)
+				for (int ni = 0; ni <= nPos; ni++)
 					tmp += Kernel::k_function(xnt, prob->x[n_index[ni]], *param) * an[ni] * 
 								Kernel::k_function(prob->x[beta_index[ci]], prob->x[n_index[ni]], *param);
 				//tmp += 1.0 * ann * 1.0; //just for RBF
